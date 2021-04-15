@@ -1,0 +1,5 @@
+src/
+node_modules/
+.eslintrc.js
+.npmrc
+package-lock.json

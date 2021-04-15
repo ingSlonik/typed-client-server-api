@@ -1,0 +1,45 @@
+{
+    "name": "typed-client-server-api",
+    "version": "0.1.0",
+    "description": "Create REST-ish API server and client implementation without mistakes.",
+    "main": "server/server.js",
+    "browser": "client/client.js",
+    "types": "types.d.ts",
+    "scripts": {
+        "build": "npm run build:server && npm run build:client",
+        "build:server": "tsc src/server.ts --outDir server --module CommonJS --declaration --target es2017 --esModuleInterop",
+        "build:client": "tsc src/hooks.ts --outDir client --module CommonJS --lib dom,es2015 --declaration --target es5 --moduleResolution node"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.11",
+        "@types/react": "^17.0.3",
+        "eslint": "^7.24.0",
+        "express": "^4.17.1",
+        "ts-node": "^9.1.1",
+        "typescript": "^4.2.4"
+    },
+    "dependencies": {
+        "react": "x.x.x"
+    },
+    "keywords": [
+        "easy&lite",
+        "REST",
+        "API",
+        "definition",
+        "node",
+        "server",
+        "client",
+        "browser",
+        "react",
+        "TypeScript"
+    ],
+    "author": "Filip Paulů <ing.fenix@seznam.cz>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ingSlonik/typed-client-server-api.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ingSlonik/typed-client-server-api/issues"
+    }
+}
