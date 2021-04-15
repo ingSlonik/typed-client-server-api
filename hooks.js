@@ -1,4 +1,4 @@
 var hooks = require("./client/hooks");
 exports.default = hooks;
-exports.setServerUrl = setServerUrl;
+exports.setServerUrl = hooks.setServerUrl;
 exports.getUseAPIFrontend = hooks.getUseAPIFrontend;
