@@ -35,7 +35,7 @@ export const api = getAPIFrontend<API>();
 ### React
 
 ```js
-import { getUseAPIFrontend } from "typed-client-server-api/hooks";
+import { setServerUrl, getUseAPIFrontend } from "typed-client-server-api/hooks";
 import { API } from "../api.d.ts";
 
 setServerUrl(process.env.NODE_ENV === "development" ? "http://localhost:8080" : "");
