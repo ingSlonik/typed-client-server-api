@@ -24,23 +24,27 @@ export type API = APIDefinition<{
 ## Browser
 
 ```js
-import { setServerUrl, getAPIFrontend } from "typed-client-server-api";
+import { setServerUrl, getAPIFrontend, setHeaders } from "typed-client-server-api";
 import { API } from "../api.d.ts";
 
 setServerUrl(process.env.NODE_ENV === "development" ? "http://localhost:8080" : "");
 
 export const api = getAPIFrontend<API>();
+
+const [ photo, error, status ]  = await api.addPhoto({ data });
 ```
 
 ### React
 
 ```js
-import { setServerUrl, getUseAPIFrontend } from "typed-client-server-api/hooks";
+import { setServerUrl, getUseAPIFrontend, setHeaders } from "typed-client-server-api/hooks";
 import { API } from "../api.d.ts";
 
 setServerUrl(process.env.NODE_ENV === "development" ? "http://localhost:8080" : "");
 
 export const useApi = getUseAPIFrontend<API>();
+
+const [ result, error, isLoading, status ] = useApi.getPhoto({ id });
 ```
 
 ## Node
@@ -53,11 +57,14 @@ import { API } from "../api.d.ts";
 
 const app = express();
 
+app.use(express.json());
+
 setAPIBackend<API>(app, {
-    addPhoto: async () => {
+    async addPhoto({ data }, req, res) {
+        // check permission with `req`
         // add photo and return string
     },
-    getPhoto: async ({ type, color }) => {
+    async getPhoto({ id }) {
         // return photo
     },
     // other methods
