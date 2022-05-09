@@ -1,15 +1,26 @@
 import { API, Result, getUrlFromEndpoint, getMethodFromEndpoint } from "./index";
 
+type Headers = Record<string, string>;
+
 export type APIFrontend<T extends API> = {
     [I in keyof T]: (params: T[I]["params"]) => Promise<Result<T[I]["result"]>>;
 };
 
 let serverUrl = "";
+let getHeaders: () => Headers = () => ({});
 
 export * from "./index";
 
 export function setServerUrl(url: string): void {
     serverUrl = url;
+}
+
+export function setHeaders(headers: Headers | (() => Headers)): void {
+    if (typeof headers === "function") {
+        getHeaders = headers;
+    } else {
+        getHeaders = () => headers;
+    }
 }
 
 export function getAPIFrontend<T extends API>(): APIFrontend<T> {
@@ -18,7 +29,7 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
             if (endpoint === "$$typeof")
                 return null;
 
-            const headers: { [key: string]: string } = { "Content-Type": "application/json" };
+            const headers: Headers = { "Content-Type": "application/json", ...getHeaders() };
             const method = getMethodFromEndpoint(endpoint);
             const url = getUrlFromEndpoint(endpoint);
 
@@ -43,16 +54,16 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                 if (response.status === 200) {
                     // I trust the backed
                     const json = await response.json();
-                    return [ json, null, 200 ];
+                    return [json, null, 200];
                 } else {
                     let error = "Server error.";
 
                     try {
                         const json = await response.json();
                         if ("message" in json) error = json.message;
-                    } catch (e) {}
+                    } catch (e) { }
 
-                    return [ null,error, response.status ];
+                    return [null, error, response.status];
                 }
 
             };
