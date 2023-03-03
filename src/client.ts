@@ -37,20 +37,25 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                 let query = "";
                 if (method === "GET" || method === "DELETE") {
                     query = Object
-                        .keys(params)
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        .map(key => `${key}=${decodeURIComponent((params as any)[key])}`)
+                        .entries(params)
+                        .map(([key, value]) => `${key}=${decodeURIComponent(typeof value === "string" ? value : JSON.stringify(value))}`)
                         .join("&");
                 }
 
-                const response = await fetch(
-                    `${serverUrl}${url}?${query}`,
-                    {
-                        method,
-                        headers,
-                        body: method === "POST" || method === "PUT" ? JSON.stringify(params) : undefined,
-                    },
-                );
+                let response: Response;
+                try {
+                    response = await fetch(
+                        `${serverUrl}${url}?${query}`,
+                        {
+                            method,
+                            headers,
+                            body: method === "POST" || method === "PUT" ? JSON.stringify(params) : undefined,
+                        },
+                    );
+                } catch (e) {
+                    return [null, "Service Unavailable", 503];
+                }
+
                 if (response.status === 200) {
                     // I trust the backed
                     const json = await response.json();
