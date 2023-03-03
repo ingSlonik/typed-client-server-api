@@ -31,6 +31,7 @@ setServerUrl(process.env.NODE_ENV === "development" ? "http://localhost:8080" : 
 
 export const api = getAPIFrontend<API>();
 
+// usage
 const [ photo, error, status ]  = await api.addPhoto({ data });
 ```
 
@@ -44,6 +45,7 @@ setServerUrl(process.env.NODE_ENV === "development" ? "http://localhost:8080" : 
 
 export const useApi = getUseAPIFrontend<API>();
 
+// usage
 const [ result, error, isLoading, status ] = useApi.getPhoto({ id });
 ```
 
