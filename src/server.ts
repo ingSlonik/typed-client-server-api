@@ -12,7 +12,19 @@ export function setAPIBackend<T extends API>(app: Express, api: APIBackendImplem
         const url = getUrlFromEndpoint(endpoint);
 
         app[method](url, async (req, res) => {
-            const params = method === "get" || method === "delete" ? req.query : req.body;
+            let params: any = {};
+            if (method === "get" || method === "delete") {
+                for (let [key, value] of Object.entries(req.query)) {
+                    if (typeof value === "string") {
+                        try {
+                            value = JSON.parse(value);
+                        } catch (e) { }
+                    }
+                    params[key] = value;
+                }
+            } else {
+                params = req.body;
+            }
 
             const log = { date: new Date().toISOString(), url, method, params };
 
@@ -26,11 +38,12 @@ export function setAPIBackend<T extends API>(app: Express, api: APIBackendImplem
                 res.status(200);
                 res.setHeader("Cache-Control", "no-cache");
                 res.send(JSON.stringify(result || null));
-            } catch (e) {
+            } catch (e: any) {
+                const message = typeof e === "object" && e !== null && typeof e.message === "string" ? e.message : JSON.stringify(e);
                 // eslint-disable-next-line no-console
-                console.log("Error:", new Date(), url, e.message);
+                console.log("Error:", new Date(), url, message);
                 res.status(400);
-                res.send({ message: e.message });
+                res.send({ message });
             }
         });
     }
