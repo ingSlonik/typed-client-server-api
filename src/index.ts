@@ -15,9 +15,9 @@ export type Result<T> =
 | [ result: null, error: string, status: number ];
 
 export type UseResult<T> = 
-| [ result: null, error: null, isLoading: true, status: 0 ]
-| [ result: T, error: null, isLoading: false, status: 200 ]
-| [ result: null, error: string, isLoading: false, status: number ];
+| [ result: null,   error: null,    isLoading: true,    status: 0,      reload: () => void ]
+| [ result: T,      error: null,    isLoading: false,   status: 200,    reload: () => void ]
+| [ result: null,   error: string,  isLoading: false,   status: number, reload: () => void ];
 
 export type APIDefinition<T extends API> = T;
 

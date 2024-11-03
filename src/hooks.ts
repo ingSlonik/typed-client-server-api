@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 import { API, UseResult } from "./index";
 import { getAPIFrontend } from "./client";
@@ -16,14 +16,25 @@ export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
         get: (_, endpoint: string) => {
 
             return (params: any) => {
-                const [result, setResult] = useState<UseResult<any>>([null, null, true, 0]);
+                const [result, setResult] = useState([null, null, true, 0]);
+
+                const [reloadVariable, setReloadVariable] = useState(0);
+                const reload = useMemo(() => () => {
+                    setResult([null, null, true, 0]);
+                    setReloadVariable(v => v + 1);
+                }, []);
+
+                const refMounted = useRef(true);
+                useEffect(() => () => { refMounted.current = false; }, []);
 
                 useEffect(() => {
-                    api[endpoint](params).then((result: any) => setResult([result[0], result[1], false, result[2]]));
+                    api[endpoint](params).then((result: any) => {
+                        if (refMounted.current) setResult([result[0], result[1], false, result[2]]);
+                    });
                     // eslint-disable-next-line react-hooks/exhaustive-deps
-                }, [JSON.stringify(params)]);
+                }, [JSON.stringify(params), reloadVariable]);
 
-                return result;
+                return [ ...result, reload ];
             };
         },
     }) as UseAPIFrontend<T>;
