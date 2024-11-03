@@ -46,7 +46,9 @@ setServerUrl(process.env.NODE_ENV === "development" ? "http://localhost:8080" : 
 export const useApi = getUseAPIFrontend<API>();
 
 // usage
-const [ result, error, isLoading, status ] = useApi.getPhoto({ id });
+function App() {
+    const [ result, error, isLoading, status, reload ] = useApi.getPhoto({ id });
+    ...
 ```
 
 ## Node
