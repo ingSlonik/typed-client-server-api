@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 
-import { API, UseResult } from "./index";
+import { API, Result, UseResult } from "./index";
 import { getAPIFrontend } from "./client";
 
 export type UseAPIFrontend<T extends API> = {
@@ -16,25 +16,32 @@ export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
         get: (_, endpoint: string) => {
 
             return (params: any) => {
-                const [result, setResult] = useState([null, null, true, 0]);
-
+                
                 const [reloadVariable, setReloadVariable] = useState(0);
                 const reload = useMemo(() => () => {
-                    setResult([null, null, true, 0]);
+                    setResult([null, null, true, 0, reload]);
                     setReloadVariable(v => v + 1);
                 }, []);
 
-                const refMounted = useRef(true);
-                useEffect(() => () => { refMounted.current = false; }, []);
+                const refMounted = useRef(false);
+                useEffect(() => {
+                    refMounted.current = true;
+                    return () => {
+                        refMounted.current = false;
+                    };
+                }, []);
+
+                const [result, setResult] = useState<UseResult<T>>([null, null, true, 0, reload]);
 
                 useEffect(() => {
-                    api[endpoint](params).then((result: any) => {
-                        if (refMounted.current) setResult([result[0], result[1], false, result[2]]);
+                    api[endpoint](params).then((result: Result<T>) => {
+                        if (refMounted.current)
+                            setResult([result[0] as any, result[1] as any, false, result[2], reload]);
                     });
                     // eslint-disable-next-line react-hooks/exhaustive-deps
                 }, [JSON.stringify(params), reloadVariable]);
 
-                return [ ...result, reload ];
+                return result;
             };
         },
     }) as UseAPIFrontend<T>;
