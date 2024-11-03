@@ -32,18 +32,17 @@ export function setAPIBackend<T extends API>(app: Express, api: APIBackendImplem
                 // eslint-disable-next-line no-console
                 console.log(`${log.date}: ${method} ${url}`, params);
 
-            res.type("json");
             try {
                 const result = await api[endpoint](params, req, res);
                 res.status(200);
                 res.setHeader("Cache-Control", "no-cache");
-                res.send(result || null);
+                res.json(result || null);
             } catch (e: any) {
                 const message = typeof e === "object" && e !== null && typeof e.message === "string" ? e.message : JSON.stringify(e);
                 // eslint-disable-next-line no-console
                 console.log("Error:", new Date(), url, message);
                 res.status(400);
-                res.send({ message });
+                res.json({ message });
             }
         });
     }
