@@ -37,7 +37,7 @@ export function setAPIBackend<T extends API>(app: Express, api: APIBackendImplem
                 const result = await api[endpoint](params, req, res);
                 res.status(200);
                 res.setHeader("Cache-Control", "no-cache");
-                res.send(JSON.stringify(result || null));
+                res.send(result || null);
             } catch (e: any) {
                 const message = typeof e === "object" && e !== null && typeof e.message === "string" ? e.message : JSON.stringify(e);
                 // eslint-disable-next-line no-console
