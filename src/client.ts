@@ -57,15 +57,23 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                 }
 
                 if (response.status === 200) {
-                    // I trust the backed
-                    const json = await response.json();
-                    return [json, null, 200];
+                    try {
+                        // I trust the backed
+                        const json = await response.json();
+                        return [json, null, 200];
+                    } catch (e) {
+                        let error = "Parsing error.";
+                        if (e !== null && typeof e === "object" && "message" in e && typeof e.message === "string")
+                            error = e.message;
+                        return [null, error, 200];
+                    }
                 } else {
                     let error = "Server error.";
 
                     try {
                         const json = await response.json();
-                        if ("message" in json) error = json.message;
+                        if (typeof json.message === "string")
+                            error = json.message;
                     } catch (e) { }
 
                     return [null, error, response.status];
