@@ -33,9 +33,12 @@ export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
 
                 const [result, setResult] = useState<UseResult<T>>([null, null, true, 0, reload]);
 
+                const refLast = useRef({});
                 useEffect(() => {
+                    const last = refLast.current = {};
+                    setResult([null, null, true, 0, reload]);
                     api[endpoint](params).then((result: Result<T>) => {
-                        if (refMounted.current)
+                        if (refMounted.current && last === refLast.current)
                             setResult([result[0] as any, result[1] as any, false, result[2], reload]);
                     });
                     // eslint-disable-next-line react-hooks/exhaustive-deps
