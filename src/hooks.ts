@@ -19,7 +19,6 @@ export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
                 
                 const [reloadVariable, setReloadVariable] = useState(0);
                 const reload = useMemo(() => () => {
-                    setResult([null, null, true, 0, reload]);
                     setReloadVariable(v => v + 1);
                 }, []);
 
