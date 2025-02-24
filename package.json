@@ -1,6 +1,6 @@
 {
     "name": "typed-client-server-api",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Create REST-ish API server and client implementation without mistakes.",
     "main": "server/server.js",
     "browser": "client/client.js",
