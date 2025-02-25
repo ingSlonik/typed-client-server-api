@@ -38,7 +38,8 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                 if (method === "GET" || method === "DELETE") {
                     query = Object
                         .entries(params)
-                        .map(([key, value]) => `${key}=${decodeURIComponent(typeof value === "string" ? value : JSON.stringify(value))}`)
+                        // always stringify for values such as "null" or "123"
+                        .map(([key, value]) => `${decodeURIComponent(key)}=${decodeURIComponent(JSON.stringify(value))}`)
                         .join("&");
                 }
 

@@ -54,6 +54,7 @@ function getParams(method: MethodLowerCase, req: Request): Record<string, any> {
         for (let [key, value] of Object.entries(req.query)) {
             if (typeof value === "string") {
                 try {
+                    // TODO: what if the string is "null" or "123"
                     value = JSON.parse(value);
                 } catch (e) { }
             }
