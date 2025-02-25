@@ -7,8 +7,8 @@
     "types": "types.d.ts",
     "scripts": {
         "build": "npm run build:server && npm run build:client",
-        "build:server": "tsc src/server.ts --outDir server --module CommonJS --declaration --target es2017 --esModuleInterop",
-        "build:client": "tsc src/hooks.ts --outDir client --module CommonJS --lib dom,es2015 --declaration --target es5 --moduleResolution node"
+        "build:server": "tsc src/server.ts --outDir server --module CommonJS --declaration --target ESNext --esModuleInterop",
+        "build:client": "tsc src/hooks.ts --outDir client --module CommonJS --lib dom,es2015 --declaration --target ESNext --moduleResolution node"
     },
     "devDependencies": {
         "@types/express": "^4.17.11",
