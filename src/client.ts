@@ -3,7 +3,10 @@ import { API, Result, getUrlFromEndpoint, getMethodFromEndpoint } from "./index"
 type Headers = Record<string, string>;
 
 export type APIFrontend<T extends API> = {
-    [I in keyof T]: (params: T[I]["params"]) => Promise<Result<T[I]["result"]>>;
+    [I in keyof T]: {
+        (params: T[I]["params"]): Promise<Result<T[I]["result"]>>;
+        getUrl: (params: T[I]["params"]) => string;
+    };
 };
 
 let serverUrl = "";
@@ -33,7 +36,7 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
             const method = getMethodFromEndpoint(endpoint);
             const url = getUrlFromEndpoint(endpoint);
 
-            return async (params: { [key: string]: unknown }) => {
+            const buildUrl = (params: { [key: string]: unknown }) => {
                 let query = "";
                 if (method === "GET" || method === "DELETE") {
                     query = Object
@@ -42,11 +45,14 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                         .map(([key, value]) => `${decodeURIComponent(key)}=${decodeURIComponent(JSON.stringify(value))}`)
                         .join("&");
                 }
+                return query ? `${serverUrl}${url}?${query}` : `${serverUrl}${url}`;
+            };
 
+            const apiCall = async (params: { [key: string]: unknown }) => {
                 let response: Response;
                 try {
                     response = await fetch(
-                        `${serverUrl}${url}?${query}`,
+                        buildUrl(params),
                         {
                             method,
                             headers,
@@ -81,6 +87,9 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                 }
 
             };
+
+            apiCall.getUrl = buildUrl;
+            return apiCall;
         },
     }) as APIFrontend<T>;
 }

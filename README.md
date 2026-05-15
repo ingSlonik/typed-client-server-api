@@ -33,6 +33,9 @@ export const api = getAPIFrontend<API>();
 
 // usage
 const [ photo, error, status ]  = await api.addPhoto({ data });
+
+// get url only (without triggering request)
+const url = api.getPhoto.getUrl({ id: "123" });
 ```
 
 ### React
