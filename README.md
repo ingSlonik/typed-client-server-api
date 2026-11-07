@@ -9,30 +9,36 @@ Create REST-ish API server and client implementation without mistakes.
 ## API definition
 
 Define types to file for client and server in one file `api.d.ts`.
+Endpoint names must start with an HTTP verb (`get`, `post`, `put`, `delete`).
 
-```js
+```ts
 import { APIDefinition, Endpoint } from "typed-client-server-api";
 
 export type API = APIDefinition<{
-    addPhoto: Endpoint<Photo, string>,
+    postPhoto: Endpoint<Photo, string>,
     getPhoto: Endpoint<{ id: string }, Photo>,
-    updatePhoto: Endpoint<Photo, void>,
-    removePhoto: Endpoint<{ id: string }, void>,
+    putPhoto: Endpoint<Photo, void>,
+    deletePhoto: Endpoint<{ id: string }, void>,
 }>;
 ```
 
 ## Browser
 
-```js
-import { setServerUrl, getAPIFrontend, setHeaders } from "typed-client-server-api";
+```ts
+import { setServerUrl, getAPIFrontend, setHeaders, setErrorHandler } from "typed-client-server-api";
 import { API } from "../api.d.ts";
 
 setServerUrl(process.env.NODE_ENV === "development" ? "http://localhost:8080" : "");
 
+setErrorHandler(({ endpoint, url, method, status, error, originalError }) => {
+    // Log 4xx, 5xx, network (503) or parsing errors to Sentry / monitoring tool
+    console.error(`[API Error] ${method} ${url} (${endpoint}) -> ${status}: ${error}`, originalError);
+});
+
 export const api = getAPIFrontend<API>();
 
 // usage
-const [ photo, error, status ]  = await api.addPhoto({ data });
+const [ photo, error, status ] = await api.postPhoto({ data });
 
 // get url only (without triggering request)
 const url = api.getPhoto.getUrl({ id: "123" });
@@ -67,7 +73,7 @@ const app = express();
 app.use(express.json());
 
 setAPIBackend<API>(app, {
-    async addPhoto({ data }, req, res) {
+    async postPhoto({ data }, req, res) {
         // check permission with `req`
         // add photo and return string
     },
