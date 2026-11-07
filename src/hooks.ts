@@ -14,10 +14,12 @@ export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
 
     return new Proxy({}, {
         get: (_, endpoint: string) => {
+            if (typeof endpoint !== "string" || endpoint === "$$typeof" || endpoint === "then")
+                return null;
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return (params: any) => {
-                
-                const [reloadVariable, setReloadVariable] = useState(0);
+                const [ reloadVariable, setReloadVariable ] = useState(0);
                 const reload = useMemo(() => () => {
                     setReloadVariable(v => v + 1);
                 }, []);
@@ -30,18 +32,23 @@ export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
                     };
                 }, []);
 
-                const [result, setResult] = useState<UseResult<T>>([null, null, true, 0, reload]);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const [ result, setResult ] = useState<UseResult<any>>([ null, null, true, 0, reload ]);
 
                 const refLast = useRef({});
+                const serializedParams = JSON.stringify(params);
+
                 useEffect(() => {
                     const last = refLast.current = {};
-                    setResult([null, null, true, 0, reload]);
-                    api[endpoint](params).then((result: Result<T>) => {
-                        if (refMounted.current && last === refLast.current)
-                            setResult([result[0] as any, result[1] as any, false, result[2], reload]);
+                    setResult([ null, null, true, 0, reload ]);
+                    api[endpoint](params).then((res: Result<unknown>) => {
+                        if (refMounted.current && last === refLast.current) {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            setResult([ res[0], res[1], false, res[2], reload ] as UseResult<any>);
+                        }
                     });
                     // eslint-disable-next-line react-hooks/exhaustive-deps
-                }, [JSON.stringify(params), reloadVariable]);
+                }, [ serializedParams, reloadVariable ]);
 
                 return result;
             };
