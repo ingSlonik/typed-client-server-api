@@ -8,7 +8,8 @@
     "scripts": {
         "build": "npm run build:server && npm run build:client",
         "build:server": "tsc src/server.ts --outDir server --module CommonJS --declaration --target ESNext --esModuleInterop",
-        "build:client": "tsc src/hooks.ts --outDir client --module CommonJS --lib dom,es2015 --declaration --target ESNext --moduleResolution node"
+        "build:client": "tsc src/hooks.ts --outDir client --module CommonJS --lib dom,es2015 --declaration --target ESNext --moduleResolution node",
+        "test": "npm run build && tsc --noEmit && node --test test/api.test.js"
     },
     "devDependencies": {
         "@types/express": "^4.17.11",
@@ -33,7 +34,7 @@
         "react",
         "TypeScript"
     ],
-    "author": "Filip Paulů <ing.fenix@seznam.cz>",
+    "author": "Filip Paul\u016f <ing.fenix@seznam.cz>",
     "license": "MIT",
     "repository": {
         "type": "git",

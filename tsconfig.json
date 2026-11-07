@@ -17,6 +17,7 @@
     "isolatedModules": true
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ]
 }
