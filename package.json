@@ -1,6 +1,6 @@
 {
     "name": "typed-client-server-api",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "description": "Create REST-ish API server and client implementation without mistakes.",
     "main": "server/server.js",
     "browser": "client/client.js",
@@ -34,7 +34,7 @@
         "react",
         "TypeScript"
     ],
-    "author": "Filip Paul\u016f <ing.fenix@seznam.cz>",
+    "author": "Filip Paulů <ing.fenix@seznam.cz>",
     "license": "MIT",
     "repository": {
         "type": "git",
