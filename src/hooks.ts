@@ -7,7 +7,13 @@ export type UseAPIFrontend<T extends API> = {
     [I in keyof T]: (params: T[I]["params"]) => UseResult<T[I]["result"]>;
 };
 
-export { getAPIFrontend, setServerUrl, setHeaders } from "./client";
+export {
+    getAPIFrontend,
+    setServerUrl,
+    setHeaders,
+    setErrorHandler,
+} from "./client";
+export type { ClientErrorInfo, ErrorHandler } from "./client";
 
 export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
     const api = getAPIFrontend<T>();
@@ -55,3 +61,4 @@ export function getUseAPIFrontend<T extends API>(): UseAPIFrontend<T> {
         },
     }) as UseAPIFrontend<T>;
 }
+

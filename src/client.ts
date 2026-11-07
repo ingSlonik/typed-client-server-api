@@ -1,6 +1,19 @@
-import { API, Result, getUrlFromEndpoint, getMethodFromEndpoint } from "./index";
+import { API, Method, Result, getUrlFromEndpoint, getMethodFromEndpoint } from "./index";
 
 type Headers = Record<string, string>;
+
+export type ClientErrorInfo = {
+    endpoint: string,
+    url: string,
+    method: Method,
+    params: { [key: string]: unknown },
+    status: number,
+    error: string,
+    originalError?: unknown,
+    response?: Response,
+};
+
+export type ErrorHandler = (errorInfo: ClientErrorInfo) => void;
 
 export type APIFrontend<T extends API> = {
     [I in keyof T]: {
@@ -11,6 +24,7 @@ export type APIFrontend<T extends API> = {
 
 let serverUrl = "";
 let getHeaders: () => Headers = () => ({});
+let errorHandler: ErrorHandler | null = null;
 
 export * from "./index";
 
@@ -23,6 +37,21 @@ export function setHeaders(headers: Headers | (() => Headers)): void {
         getHeaders = headers;
     } else {
         getHeaders = () => headers;
+    }
+}
+
+export function setErrorHandler(handler: ErrorHandler | null): void {
+    errorHandler = handler;
+}
+
+function reportError(info: ClientErrorInfo): void {
+    if (!errorHandler)
+        return;
+
+    try {
+        errorHandler(info);
+    } catch (e) {
+        // Ignore errors thrown by custom error logger
     }
 }
 
@@ -65,7 +94,17 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                         },
                     );
                 } catch (e) {
-                    return [ null, "Service Unavailable", 503 ];
+                    const error = "Service Unavailable";
+                    reportError({
+                        endpoint,
+                        url: requestUrl,
+                        method,
+                        params,
+                        status: 503,
+                        error,
+                        originalError: e,
+                    });
+                    return [ null, error, 503 ];
                 }
 
                 if (response.status === 200) {
@@ -83,6 +122,16 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                             error = (e as Error).message;
                         }
 
+                        reportError({
+                            endpoint,
+                            url: requestUrl,
+                            method,
+                            params,
+                            status: 200,
+                            error,
+                            originalError: e,
+                            response,
+                        });
                         return [ null, error, 200 ];
                     }
                 } else {
@@ -96,6 +145,15 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
                         // Ignore JSON parse errors on error responses
                     }
 
+                    reportError({
+                        endpoint,
+                        url: requestUrl,
+                        method,
+                        params,
+                        status: response.status,
+                        error,
+                        response,
+                    });
                     return [ null, error, response.status ];
                 }
             };
@@ -105,3 +163,4 @@ export function getAPIFrontend<T extends API>(): APIFrontend<T> {
         },
     }) as APIFrontend<T>;
 }
+
